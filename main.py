@@ -1,8 +1,8 @@
 from interactions import slash_command, slash_option, SlashContext, OptionType
-from config import *
 import discord
 import table_functions as tf
 import interactions
+from config import *
 
 bot = interactions.Client()
 
