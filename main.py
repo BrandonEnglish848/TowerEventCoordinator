@@ -1,4 +1,4 @@
-from interactions import slash_command, slash_option, SlashContext, OptionType
+from interactions import slash_command, slash_option, SlashContext, OptionType, check, is_owner
 import discord
 import table_functions as tf
 import interactions
@@ -9,6 +9,16 @@ bot = interactions.Client()
 @interactions.listen()
 async def on_startup():
 	await tf.initialize_tables()
+
+@slash_command(name="owner", description="Commands For The Bot Owner", sub_cmd_name="initialize", sub_cmd_description="Initialize all of the tables the bot requires.")
+@check(is_owner())
+async def initialize(ctx: SlashContext):
+	await ctx.send(await tf.initialize_tables())
+
+@slash_command(name="owner", description="Commands For The Bot Owner", sub_cmd_name="drop", sub_cmd_description="Drop all of the tables the bot requires.")
+@check(is_owner())
+async def drop(ctx: SlashContext):
+	await ctx.send(await tf.drop_tables())
 
 @slash_command(name="get_current_event_id")
 async def get_current_event_id(ctx: SlashContext):
@@ -27,14 +37,6 @@ async def get_next_team_id(ctx: SlashContext):
 		await ctx.send(await tf.get_next_team_id_by_event_id(event_id))
 	else:
 		await ctx.send("No Current Event ID.")
-
-@slash_command(name="initialize")
-async def initialize(ctx: SlashContext):
-	await ctx.send(await tf.initialize_tables())
-
-@slash_command(name="drop")
-async def drop(ctx: SlashContext):
-	await ctx.send(await tf.drop_tables())
 
 @slash_command(name="get_teams")
 async def get_teams(ctx: SlashContext):
