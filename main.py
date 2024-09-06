@@ -62,58 +62,60 @@ async def create_team(ctx: SlashContext):
 	# Generate a new category channel
 	category:discord.CategoryChannel = await current_guild.create_category_channel(name=team_number)
 	# Insert Channel
-	await tf.insert_channel(event_number, team_number, category.id, "Category")
+	await tf.insert_channel(event_number, category.id, "Category")
 
 	# Set Category Permissions
 	await category.set_permissions(target=role, view_channel=True, read_message_history=True, send_messages=True, connect=True, speak=True)
 	await category.set_permissions(target=ctx.guild.default_role, view_audit_log=False, view_channel=False, read_message_history=False, connect=False)
 
 	# Create Text Channel
-	current_channel = await current_guild.create_text_channel(name=f"text-{role.id}", category=category)
+	channel = await current_guild.create_text_channel(name=f"text-{role.id}", category=category)
 	# Insert Channel
-	await tf.insert_channel(event_number, team_number, current_channel.id, "Text")
+	await tf.insert_channel(event_number, channel.id, "Text")
 
 	# Create Voice Channel
-	current_channel = await current_guild.create_voice_channel(name=f"voice-{role.id}", category=category)
+	channel = await current_guild.create_voice_channel(name=f"voice-{role.id}", category=category)
 	# Insert Channel
-	await tf.insert_channel(event_number, team_number, current_channel.id, "Voice")
+	await tf.insert_channel(event_number, channel.id, "Voice")
 
 @slash_command(name="create_admin")
 async def create_admin(ctx: SlashContext):
 	# Get the current event number
 	event_number = await tf.get_current_event_id(ctx.guild.id)
 
-	# Set the current guild
-	current_guild:discord.Guild = ctx.guild
+	if not tf.get_admin_role_for_event(event_number):
 
-	# Create the Admin Role for this Event
-	role:discord.Role = await current_guild.create_role(name=f"admin_{event_number}")
-	# Insert Role
-	await tf.insert_role(event_number, role.id, role.name)
+		# Set the current guild
+		current_guild:discord.Guild = ctx.guild
 
-	# Create Admin Category
-	category:discord.CategoryChannel = await current_guild.create_category(name=f"admin_channels_{event_number}")
-	# Insert Channel
-	await tf.insert_channel(event_number, 0, category.id, "Category")
+		# Create the Admin Role for this Event
+		role:discord.Role = await current_guild.create_role(name=f"admin_{event_number}")
+		# Insert Role
+		await tf.insert_role(event_number, role.id, role.name)
 
-	# Set Category Permissions
-	await category.set_permissions(target=role, view_channel=True, read_message_history=True, send_messages=True, connect=True, speak=True)
-	await category.set_permissions(target=ctx.guild.default_role, view_audit_log=False, view_channel=False, read_message_history=False, connect=False)
+		# Create Admin Category
+		category:discord.CategoryChannel = await current_guild.create_category(name=f"admin_channels_{event_number}")
+		# Insert Channel
+		await tf.insert_channel(event_number, category.id, "Category")
 
-	# Create BotCommand Channel
-	current_channel = await current_guild.create_text_channel(name=f"botcommands-{role.id}", category=category)
-	# Insert Channel
-	await tf.insert_channel(event_number, 0, current_channel.id, "Text")
+		# Set Category Permissions
+		await category.set_permissions(target=role, view_channel=True, read_message_history=True, send_messages=True, connect=True, speak=True)
+		await category.set_permissions(target=ctx.guild.default_role, view_audit_log=False, view_channel=False, read_message_history=False, connect=False)
 
-	# Create Text Channel
-	current_channel = await current_guild.create_text_channel(f"text-{role.id}", category=category)
-	# Insert Channel
-	await tf.insert_channel(event_number, 0, current_channel.id, "Text")
+		# Create BotCommand Channel
+		channel = await current_guild.create_text_channel(name=f"botcommands-{role.id}", category=category)
+		# Insert Channel
+		await tf.insert_channel(event_number, channel.id, "Text")
 
-	# Create Voice Channel
-	await current_guild.create_voice_channel(f"voice-{role.id}", category=category)
-	# Insert Channel
-	await tf.insert_channel(event_number, 0, current_channel.id, "Voice")
+		# Create Text Channel
+		channel = await current_guild.create_text_channel(f"text-{role.id}", category=category)
+		# Insert Channel
+		await tf.insert_channel(event_number, channel.id, "Text")
+
+		# Create Voice Channel
+		channel = await current_guild.create_voice_channel(f"voice-{role.id}", category=category)
+		# Insert Channel
+		await tf.insert_channel(event_number, channel.id, "Voice")
 
 @slash_command(name="set_admin")
 @slash_option(name="member", description="The user to give the admin role", required=True, opt_type=OptionType.USER)

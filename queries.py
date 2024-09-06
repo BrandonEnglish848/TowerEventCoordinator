@@ -7,7 +7,7 @@ initialization_queries = [
 	"CREATE TABLE IF NOT EXISTS `Roles` (`EventID` BIGINT NOT NULL, `RoleID` BIGINT NOT NULL, `RoleName` VARCHAR(255) NOT NULL, PRIMARY KEY (`EventID`, `RoleID`));",
 	"CREATE TABLE IF NOT EXISTS `Rooms` (`RoomID` BIGINT NOT NULL, `RoomTitle` VARCHAR(255), `Description` VARCHAR(255), `BlessingsChallengeDescription` VARCHAR(255), PRIMARY KEY (`RoomID`));",
 	"CREATE TABLE IF NOT EXISTS `TeamBlessings` (`EventID` BIGINT NOT NULL, `TeamID` BIGINT NOT NULL, `BlessingID` BIGINT NOT NULL, `BlessingCount` BIGINT DEFAULT 1, PRIMARY KEY (`EventID`, `TeamID`, `BlessingID`));",
-	"CREATE TABLE IF NOT EXISTS `TeamChannels` (`EventID` BIGINT NOT NULL, `TeamID` BIGINT NOT NULL, `ChannelID` BIGINT NOT NULL, ChannelType VARCHAR(50), PRIMARY KEY (`EventID`, `TeamID`, `ChannelID`));",
+	"CREATE TABLE IF NOT EXISTS `Channels` (`EventID` BIGINT NOT NULL, `ChannelID` BIGINT NOT NULL, ChannelType VARCHAR(50), PRIMARY KEY (`EventID`, `ChannelID`));",
 	"CREATE TABLE IF NOT EXISTS `TeamMembers` (`EventID` BIGINT NOT NULL, `TeamID` BIGINT NOT NULL, `MemberID` BIGINT NOT NULL, PRIMARY KEY (`EventID`, `TeamID`, `MemberID`));",
 	"CREATE TABLE IF NOT EXISTS `Teams` (`EventID` BIGINT NOT NULL, `TeamID` BIGINT NOT NULL, `CategoryID` BIGINT, `RoleID` BIGINT, `CurrentFloor` BIGINT DEFAULT 0, `VisibleFloor` BIGINT DEFAULT 0, PRIMARY KEY (`EventID`, `TeamID`));",
 	"CREATE TABLE IF NOT EXISTS `Transactions` (`TransactionID` BIGINT NOT NULL, `EventID` BIGINT NOT NULL, `Amount` BIGINT, `Username` VARCHAR(255), `MemberID` BIGINT, PRIMARY KEY (`TransactionID`));"
@@ -21,13 +21,13 @@ drop_tables_queries = [
 	"DROP TABLE IF EXISTS `Roles`;",
 	"DROP TABLE IF EXISTS `Rooms`;",
 	"DROP TABLE IF EXISTS `TeamBlessings`;",
-	"DROP TABLE IF EXISTS `TeamChannels`;",
+	"DROP TABLE IF EXISTS `Channels`;",
 	"DROP TABLE IF EXISTS `TeamMembers`;",
 	"DROP TABLE IF EXISTS `Teams`;",
 	"DROP TABLE IF EXISTS `Transactions`;"
 ]
 
-insert_channel_query = "INSERT INTO `Tower`.`TeamChannels` (`EventID`, `TeamID`, `ChannelID`, `ChannelType`) VALUES (%(EventID)s, %(TeamID)s, %(ChannelID)s, %(ChannelType)s);"
+insert_channel_query = "INSERT INTO `Tower`.`Channels` (`EventID`, `ChannelID`, `ChannelType`) VALUES (%(EventID)s, %(ChannelID)s, %(ChannelType)s);"
 
 insert_team_query = "INSERT INTO `Tower`.`Teams` (`EventID`, `TeamID`, `CategoryID`, `RoleID`) VALUES (%(EventID)s, %(TeamID)s, %(CategoryID)s, %(RoleID)s)"
 
@@ -44,3 +44,5 @@ get_next_team_id_query = "SELECT MAX(`TeamID`) FROM `Teams` WHERE `EventID` = %(
 get_teams_query = "SELECT `Teams`.`TeamID`, `Teams`.`CategoryID`, `Teams`.`RoleID`, `Teams`.`CurrentFloor`, `Teams`.`VisibleFloor` FROM `Tower`.`Teams` WHERE `Teams`.`EventID` = %(EventID)s;"
 
 get_next_event_id_query = "SELECT MAX(`EventID`) FROM `EVENTS`"
+
+get_admin_role_query = "SELECT `Roles`.`RoleID` FROM `Tower`.`Roles` WHERE `Roles`.`EventID` = %(EventID)s AND `Roles`.`RoleName` LIKE %(RoleName)s;"

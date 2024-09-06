@@ -1,8 +1,8 @@
 import mysql.connector
 from queries import *
-test_server_id = 1169293194983387169
+from config import *
 
-mydb = mysql.connector.connect(host="localhost", user="root", password="Logitech", database="Tower")
+mydb = mysql.connector.connect(**mysql_config)
 
 async def drop_tables():
 	mycursor = mydb.cursor()
@@ -88,6 +88,20 @@ async def get_teams(event_number: int):
 
 	return results
 
+async def get_admin_role_for_event(event_number: int):
+	mycursor = mydb.cursor()
+	mycursor.execute(
+		operation=get_admin_role_query,
+		params={
+			'EventID': event_number,
+			'RoleName': f"admin_{event_number}"
+		}
+	)
+	results = mycursor.fetchone()
+	mycursor.close()
+
+	return results
+
 async def insert_team(event_number: int, team_number: int, channel_number: int, channel_type):
 	mycursor = mydb.cursor()
 	mycursor.execute(
@@ -115,13 +129,12 @@ async def insert_team_member(event_number: int, team_number: int, member_number:
 	mydb.commit()
 	mycursor.close()
 
-async def insert_channel(event_number: int, team_number: int, channel_number: int, channel_type):
+async def insert_channel(event_number: int, channel_number: int, channel_type):
 	mycursor = mydb.cursor()
 	mycursor.execute(
 		operation=insert_channel_query,
 		params={
 			'EventID': event_number,
-			'TeamID':team_number,
 			'ChannelID': channel_number,
 			'ChannelType': channel_type
 		}
