@@ -62,53 +62,53 @@ async def create_team(ctx: SlashContext, member1: interactions.Member, member2:i
 		# Generate a new role using the team number
 		role = await ctx.guild.create_role(name=f"tower_{team_number}")
 		# Insert Role
-		if await tf.insert_role(event_number, role.id, role.name):
+		await tf.insert_role(event_number, role.id, role.name)
 
-			# Generate a new category channel
-			category = await ctx.guild.create_category(name=f"tower_team_{team_number}")
-			# Insert Channel
-			await tf.insert_channel(event_number, category.id, "Category")
+		# Generate a new category channel
+		category = await ctx.guild.create_category(name=f"tower_team_{team_number}")
+		# Insert Channel
+		await tf.insert_channel(event_number, category.id, "Category")
 
-			# Set Category Permissions
-			await category.set_permission(target=role, view_channel=True, read_message_history=True, send_messages=True, connect=True, speak=True, use_application_commands=True)
-			await category.set_permission(target=ctx.guild.default_role, view_channel=False, read_message_history=False, connect=False, speak=False, use_application_commands=False)
+		# Set Category Permissions
+		await category.set_permission(target=role, view_channel=True, read_message_history=True, send_messages=True, connect=True, speak=True, use_application_commands=True)
+		await category.set_permission(target=ctx.guild.default_role, view_channel=False, read_message_history=False, connect=False, speak=False, use_application_commands=False)
 
-			# Create Text Channel
-			channel = await ctx.guild.create_text_channel(name=f"text_{role.name}", category=category)
-			# Insert Channel
-			await tf.insert_channel(event_number, channel.id, "Text")
+		# Create Text Channel
+		channel = await ctx.guild.create_text_channel(name=f"text_{role.name}", category=category)
+		# Insert Channel
+		await tf.insert_channel(event_number, channel.id, "Text")
 
-			# Create Voice Channel
-			channel = await ctx.guild.create_voice_channel(name=f"voice_{role.name}", category=category)
-			# Insert Channel
-			await tf.insert_channel(event_number, channel.id, "Voice")
+		# Create Voice Channel
+		channel = await ctx.guild.create_voice_channel(name=f"voice_{role.name}", category=category)
+		# Insert Channel
+		await tf.insert_channel(event_number, channel.id, "Voice")
 
-			# Insert Team
-			await tf.insert_team(event_number, team_number, category.id, role.id)
+		# Insert Team
+		await tf.insert_team(event_number, team_number, category.id, role.id)
 
-			""" Begin Adding Team Members """
+		""" Begin Adding Team Members """
 
-			output = []
+		output = []
 
-			# If member is defined, add the role to the specified member.
-			if member1:
-				if await member1.add_role(role) and await tf.insert_team_member(event_number, team_number, member1.id):
-					output.append(f"Member: {member1.username} given team role {role.name}.")
-				else:
-					output.append(f"Unable to give member: {member1.username} the team role: {role.name}.")
-			# If member is defined, add the role to the specified member.
-			if member2:
-				if await member2.add_role(role) and await tf.insert_team_member(event_number, team_number, member2.id):
-					output.append(f"Member: {member2.username} given team role: {role.name}.")
-				else:
-					output.append(f"Unable to give member: {member2.username} the team role: {role.name}.")
-			# If member is defined, add the role to the specified member.
-			if member3:
-				if await member3.add_role(role) and await tf.insert_team_member(event_number, team_number, member3.id):
-					output.append(f"Member: {member3.username} given team role {role.name}.")
-				else:
-					output.append(f"Unable to give member: {member3.username} the team role: {role.name}.")
-			await ctx.send("\n".join(output))
+		# If member is defined, add the role to the specified member.
+		if member1:
+			if await member1.add_role(role) and await tf.insert_team_member(event_number, team_number, member1.id):
+				output.append(f"Member: {member1.username} given team role {role.name}.")
+			else:
+				output.append(f"Unable to give member: {member1.username} the team role: {role.name}.")
+		# If member is defined, add the role to the specified member.
+		if member2:
+			if await member2.add_role(role) and await tf.insert_team_member(event_number, team_number, member2.id):
+				output.append(f"Member: {member2.username} given team role: {role.name}.")
+			else:
+				output.append(f"Unable to give member: {member2.username} the team role: {role.name}.")
+		# If member is defined, add the role to the specified member.
+		if member3:
+			if await member3.add_role(role) and await tf.insert_team_member(event_number, team_number, member3.id):
+				output.append(f"Member: {member3.username} given team role {role.name}.")
+			else:
+				output.append(f"Unable to give member: {member3.username} the team role: {role.name}.")
+		await ctx.send("\n".join(output))
 
 	else:
 		await ctx.send("Event has not been created yet. Create one with /create event")

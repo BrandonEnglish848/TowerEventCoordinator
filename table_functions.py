@@ -183,4 +183,3 @@ async def insert_role(event_number: int, role_number: int, role_name: str):
 	)
 	mydb.commit()
 	mycursor.close()
-	return True

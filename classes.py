@@ -66,3 +66,4 @@ class Team:
 		self.team_id:int = team_id
 		self.members:[int] = []
 		self.role:int|None = None
+		self.category:int|None = None
