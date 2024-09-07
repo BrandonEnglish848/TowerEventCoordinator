@@ -1,4 +1,3 @@
-import discord
 import interactions
 from interactions import subcommand, listen, slash_option, SlashContext, OptionType, check, is_owner, guild_only
 
@@ -240,7 +239,7 @@ async def set_admin(ctx: SlashContext, member1:interactions.Member, member2:inte
 	# Get the current event number
 	event_number = await tf.get_current_event_id(ctx.guild.id)
 	if event_number and (member1 is not None or member2 is not None or member3 is not None):
-		role = discord.utils.get(ctx.guild.roles, name=f"tower_admin_{event_number}")
+		role = interactions.utils.get(ctx.guild.roles, name=f"tower_admin_{event_number}")
 		if role is not None:
 			output = []
 
@@ -276,7 +275,7 @@ async def set_team(ctx: SlashContext, member:interactions.Member, team_id:int):
 	# Get the current event number
 	event_number = await tf.get_current_event_id(ctx.guild.id)
 	if event_number:
-		team = discord.utils.get(ctx.guild.roles, name=f"tower_team_{team_id}")
+		team = interactions.utils.get(ctx.guild.roles, name=f"tower_team_{team_id}")
 		if team:
 			if await member.add_role(team):
 				# Insert Team Member
