@@ -46,3 +46,7 @@ get_teams_query = "SELECT `Teams`.`TeamID`, `Teams`.`CategoryID`, `Teams`.`RoleI
 get_next_event_id_query = "SELECT MAX(`EventID`) FROM `EVENTS`"
 
 get_admin_role_query = "SELECT `Roles`.`RoleID` FROM `Tower`.`Roles` WHERE `Roles`.`EventID` = %(EventID)s AND `Roles`.`RoleName` LIKE %(RoleName)s;"
+
+get_team_members_query = "SELECT `TeamMembers`.`MemberID` FROM `Tower`.`TeamMembers` WHERE `TeamMembers`.`EventID` = %(EventID)s  AND `TeamMembers`.`TeamID`  = %(TeamID)s;"
+
+get_team_role_query = "SELECT `Roles`.`RoleID` FROM `Tower`.`Roles` WHERE `Roles`.`EventID` = %(EventID)s AND `Roles`.`RoleName` LIKE %(RoleName)s;"

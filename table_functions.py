@@ -14,27 +14,13 @@ async def drop_tables():
 		return "All Tables Dropped."
 
 async def initialize_tables():
-	await drop_tables()
 	mycursor = mydb.cursor()
 	for i in initialization_queries:
 		mycursor.execute(i)
 	else:
-		# This will automatically create an active event in the Test server
-		await insert_event(test_server_id)
-
 		mycursor.close()
 		print("All Tables Checked.")
 		return "All Tables Checked."
-
-async def insert_event(guild_number: int):
-	mycursor = mydb.cursor()
-	event_number = await get_next_event_id()
-	mycursor.execute(
-		operation=insert_event_query,
-		params={'EventID': event_number,'GuildID': guild_number}
-	)
-	mydb.commit()
-	mycursor.close()
 
 async def get_next_event_id():
 	mycursor = mydb.cursor()
@@ -43,8 +29,11 @@ async def get_next_event_id():
 	)
 	myresult = mycursor.fetchone()
 	mycursor.close()
-
-	if myresult and myresult[0]:
+	"""
+	# Used for testing purposes
+	print(f"get_next_event_id result: {myresult}")
+	"""
+	if myresult[0] is not None:
 		return myresult[0] + 1
 	else:
 		return 1
@@ -58,7 +47,11 @@ async def get_next_team_id_by_event_id(event_number: int):
 	myresult = mycursor.fetchone()
 	mycursor.close()
 
-	if myresult and myresult[0]:
+	"""
+	# Used for testing purposes
+	print(f"get_next_team_id_by_event_id result: {myresult}")
+	"""
+	if myresult[0] is not None:
 		return myresult[0] + 1
 	else:
 		return 1
@@ -83,7 +76,29 @@ async def get_teams(event_number: int):
 		operation=get_teams_query,
 		params={'EventID': event_number}
 	)
-	results = mycursor.fetchall()
+	results:[tuple] = mycursor.fetchall()
+	mycursor.close()
+
+	return results
+
+async def get_team_members(event_number: int, team_number: int):
+	mycursor = mydb.cursor()
+	mycursor.execute(
+		operation=get_team_members_query,
+		params={'EventID': event_number,'TeamID': team_number}
+	)
+	results:[tuple] = mycursor.fetchall()
+	mycursor.close()
+
+	return results
+
+async def get_team_role(event_number: int, team_number: int):
+	mycursor = mydb.cursor()
+	mycursor.execute(
+		operation=get_team_role_query,
+		params={'EventID': event_number,'RoleName': f"tower_team_{team_number}"}
+	)
+	results:[tuple] = mycursor.fetchone()
 	mycursor.close()
 
 	return results
@@ -94,7 +109,7 @@ async def get_admin_role_for_event(event_number: int):
 		operation=get_admin_role_query,
 		params={
 			'EventID': event_number,
-			'RoleName': f"admin_{event_number}"
+			'RoleName': f"tower_admin_{event_number}"
 		}
 	)
 	results = mycursor.fetchone()
@@ -102,15 +117,29 @@ async def get_admin_role_for_event(event_number: int):
 
 	return results
 
-async def insert_team(event_number: int, team_number: int, channel_number: int, channel_type):
+async def insert_event(guild_number: int):
+	mycursor = mydb.cursor()
+	event_number = await get_next_event_id()
+	if event_number:
+		mycursor.execute(
+			operation=insert_event_query,
+			params={'EventID': event_number,'GuildID': guild_number}
+		)
+		mydb.commit()
+		mycursor.close()
+		return event_number
+	else:
+		return False
+
+async def insert_team(event_number: int, team_number: int, channel_number: int, role_number: int):
 	mycursor = mydb.cursor()
 	mycursor.execute(
 		operation=insert_team_query,
 		params={
 			'EventID': event_number,
 			'TeamID': team_number,
-			'ChannelID': channel_number,
-			'ChannelType': channel_type
+			'CategoryID': channel_number,
+			'RoleID': role_number
 		}
 	)
 	mydb.commit()
@@ -154,3 +183,4 @@ async def insert_role(event_number: int, role_number: int, role_name: str):
 	)
 	mydb.commit()
 	mycursor.close()
+	return True
